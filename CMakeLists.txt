@@ -16,9 +16,12 @@ set(CMAKE_CXX_STANDARD 14)
 INCLUDE_DIRECTORIES(${CMAKE_HOME_DIRECTORY}/include/
                     ${CMAKE_HOME_DIRECTORY}/src/)
 
-set(Boost_USE_STATI C_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
+
+set(BOOST_LIBRARYDIR "util/opt/boost/1.59/gcc/5.4/lib")
+set(BOOST_INCLUDEDIR "util/opt/boost/1.59/gcc/5.4/include")
+
 find_package(Boost COMPONENTS serialization filesystem REQUIRED)
 
 if(Boost_FOUND)
