@@ -124,7 +124,8 @@ namespace min_hash_index{
             std::vector<std::string> res_s;
             res_s.reserve(res.size());
             //std::for_each(res.begin(), res.end(), [&](uint64_t key_index){if(mh.compareHashes(keys[key_index] + app_seq, key, threshold)) {res_s.push_back(keys[key_index]);}});
-            std::for_each(res.begin(), res.end(), [&](uint64_t key_index){res_s.push_back(keys[key_index]);});
+            //std::for_each(res.begin(), res.end(), [&](uint64_t key_index){res_s.push_back(keys[key_index]);});
+            std::for_each(res.begin(), res.end(), [&](uint64_t key_index){if(uiLevenshteinDistance(keys[key_index] + app_seq, key) <= t_lim_t) {res_s.push_back(keys[key_index]);}});
             std::cout << "Matches: " << res_s.size() << std::endl;
             return {res.size(), res_s};
         }
