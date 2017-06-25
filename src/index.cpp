@@ -80,8 +80,8 @@ int main(int argc, char* argv[]){
     string sequences_file = argv[1];
     string queries_file = argv[2];
     cout << "SF: " << sequences_file << " QF:" << queries_file << endl;
-    string queries_results_file = queries_file + "_search_results.txt";
     string idx_file = idx_file_trait<w_size, app_seq_len, t_lim, threshold, n_perms>::value(sequences_file);
+    string queries_results_file = idx_file_trait<w_size, app_seq_len, t_lim, threshold, n_perms>::value(queries_file) + "_search_results.txt";
     mh_index_type mh_i;
 
     {
