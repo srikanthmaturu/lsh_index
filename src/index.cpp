@@ -110,14 +110,25 @@ int main(int argc, char* argv[]){
 
         vector<string> queries;
         load_sequences(queries_file, queries);
-        vector< vector< string > > query_results_vector(queries.size());
+        vector< vector< pair<string, uint64_t > > > query_results_vector(queries.size());
         ofstream results_file(queries_results_file);
         auto start = timer::now();
 
-        //#pragma omp parallel for
+        #pragma omp parallel for
         for(uint64_t i=0; i<queries.size(); i++){
             auto res = mh_i.match(queries[i]);
-            query_results_vector[i].insert(query_results_vector[i].begin(), res.second.begin(), res.second.end());
+            uint8_t minED = 100;
+            for(size_t j=0; j < res.second.size(); ++j){
+                uint64_t edit_distance = uiLevenshteinDistance(queries[i], res.second[j]);
+                if(edit_distance < minED){
+                    minED = edit_distance;
+                    query_results_vector[i].clear();
+                }
+                else if(edit_distance > minED){
+                    continue;
+                }
+                query_results_vector[i].push_back(make_pair(res.second[j], edit_distance));
+            }
             cout << "processed query " << i << endl;
         }
 
@@ -128,10 +139,9 @@ int main(int argc, char* argv[]){
 
         for(uint64_t i=0; i < queries.size(); i++){
             results_file << ">" << queries[i] << endl;
-            vector<string>& res = query_results_vector[i];
             cout << "Stored results of " << i << endl;
-            for(string r: res){
-                results_file << r << endl;
+            for(size_t j=0; j<query_results_vector[i].size(); j++){
+                results_file << "" << query_results_vector[i][j].first.c_str() << "  " << query_results_vector[i][j].second << endl;
             }
         }
         results_file.close();
