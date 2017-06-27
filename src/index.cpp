@@ -10,7 +10,9 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <typeinfo>
 #include <omp.h>
+
 #include "min_hash_index/xxhash.h"
 
 using namespace std;
@@ -40,11 +42,11 @@ struct my_timer{
     }
 };
 
-template<uint64_t w_size_t, uint64_t app_seq_len_t, uint64_t t_lim_t, uint64_t threshold_t, uint64_t n_perms_t>
+template<class uint_type_t, uint64_t w_size_t, uint64_t app_seq_len_t, uint64_t t_lim_t, uint64_t threshold_t, uint64_t n_perms_t>
 struct idx_file_trait{
     static std::string value(std::string hash_file){
-        return hash_file + "." + "WS_" +to_string(w_size_t)+"_"+ "ASL_" + to_string(app_seq_len_t)+"_" +
-               "TL_" +to_string(t_lim_t)+"_"+ "TH_" +to_string(threshold_t)+"_"+"NP_" +to_string(n_perms_t)+"."+index_name;
+        return hash_file + ".UIT_" + typeid(uint_type_t).name() + "WS_" +to_string(w_size_t)+"_"+ "ASL_" + to_string(app_seq_len_t)+"_" +
+               "TL_" +to_string(t_lim_t)+"_"+ "NP_" +to_string(n_perms_t)+"."+index_name;
     }
 };
 
@@ -70,6 +72,7 @@ int main(int argc, char* argv[]){
     constexpr uint64_t t_lim = T_LIM;
     constexpr uint64_t n_perms = N_PERMS;
     constexpr uint64_t threshold = THRESHOLD;
+    typedef UINT_TYPE uint_type;
     typedef LSH_INDEX_TYPE mh_index_type;
 
     if ( argc < 2 ) {
@@ -80,8 +83,8 @@ int main(int argc, char* argv[]){
     string sequences_file = argv[1];
     string queries_file = argv[2];
     cout << "SF: " << sequences_file << " QF:" << queries_file << endl;
-    string idx_file = idx_file_trait<w_size, app_seq_len, t_lim, threshold, n_perms>::value(sequences_file);
-    string queries_results_file = idx_file_trait<w_size, app_seq_len, t_lim, threshold, n_perms>::value(queries_file) + "_search_results.txt";
+    string idx_file = idx_file_trait<uint_type, w_size, app_seq_len, t_lim, threshold, n_perms>::value(sequences_file);
+    string queries_results_file = idx_file_trait<uint_type, w_size, app_seq_len, t_lim, threshold, n_perms>::value(queries_file) + "_search_results.txt";
     mh_index_type mh_i;
 
     {

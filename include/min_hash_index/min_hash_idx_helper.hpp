@@ -65,7 +65,7 @@ auto optimal_threshold(uint64_t fixed_key_size, uint64_t w_size, double threshol
     uint64_t tokens_size = fixed_key_size - w_size + 1;
     double number_of_distinct_items_estimate = w_size + t_limit - 1;
     double threshold_estimate = (float)(tokens_size - number_of_distinct_items_estimate)/(float)(tokens_size);
-    double reductionFactor = 0.90;
+    double reductionFactor = 0.70;
     return reductionFactor*threshold_estimate;
 }
 

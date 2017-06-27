@@ -35,6 +35,7 @@ endif()
 ADD_SUBDIRECTORY(lib)
 
 add_library(xxhash include/min_hash_index/xxhash.c)
+ADD_EXECUTABLE(utility src/utility.cpp)
 
 FILE(STRINGS ${CMAKE_HOME_DIRECTORY}/exp0.config exp0.lines REGEX "^[^#].*")
 FOREACH(line ${exp0.lines})
@@ -46,19 +47,20 @@ FOREACH(line ${exp0.lines})
     STRING(REGEX REPLACE "," ";" t_params ${t_part})
     #[[STRING(REGEX REPLACE "," "_" t_suffix ${t_part})
     SET(exec ${index_name}_${t_suffix})]]
-    LIST(GET t_params 0 W_SIZE)
-    LIST(GET t_params 1 APP_SEQ_LEN)
-    LIST(GET t_params 2 T_LIM)
-    LIST(GET t_params 3 THRESHOLD)
-    LIST(GET t_params 4 N_PERMS)
+    LIST(GET t_params 0 UINT_TYPE)
+    LIST(GET t_params 1 W_SIZE)
+    LIST(GET t_params 2 APP_SEQ_LEN)
+    LIST(GET t_params 3 T_LIM)
+    LIST(GET t_params 4 THRESHOLD)
+    LIST(GET t_params 5 N_PERMS)
     LIST(LENGTH t_params p_size)
     STRING(REGEX REPLACE "\\." "_" TH ${THRESHOLD})
-    IF(${p_size} EQUAL 5)
-        SET(exec ${index_name}_WS_${W_SIZE}_ASL_${APP_SEQ_LEN}_TH_${TH}_TL_${T_LIM}_NP_${N_PERMS})
+    IF(${p_size} EQUAL 6)
+        SET(exec ${index_name}_UIT_${UINT_TYPE}_WS_${W_SIZE}_ASL_${APP_SEQ_LEN}_TH_${TH}_TL_${T_LIM}_NP_${N_PERMS})
     ELSE()
-        LIST(GET t_params 5 N_SEGS)
-        LIST(GET t_params 6 SG_SIZE)
-        SET(exec ${index_name}_WS_${W_SIZE}_ASL_${APP_SEQ_LEN}_TH_${TH}_TL_${T_LIM}_NP_${N_PERMS}_NS_${N_SEGS}_SGS_${SG_SIZE})
+        LIST(GET t_params 7 N_SEGS)
+        LIST(GET t_params 8 SG_SIZE)
+        SET(exec ${index_name}_UIT_${UINT_TYPE}_WS_${W_SIZE}_ASL_${APP_SEQ_LEN}_TH_${TH}_TL_${T_LIM}_NP_${N_PERMS}_NS_${N_SEGS}_SGS_${SG_SIZE})
     ENDIF()
 
     ADD_EXECUTABLE(${exec} src/index.cpp)
@@ -66,6 +68,7 @@ FOREACH(line ${exp0.lines})
     SET_PROPERTY(TARGET ${exec} PROPERTY COMPILE_DEFINITIONS
                     INDEX_NAME="${index_name}"
                     LSH_INDEX_TYPE=${index_type}
+                    UINT_TYPE=${UINT_TYPE}
                     W_SIZE=${W_SIZE}
                     APP_SEQ_LEN=${APP_SEQ_LEN}
                     THRESHOLD=${THRESHOLD}

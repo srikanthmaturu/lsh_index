@@ -20,7 +20,7 @@
 #include <boost/archive/binary_oarchive.hpp>
 
 namespace min_hash_index{
-    template<uint64_t w_size_t, uint64_t app_seq_len_t, uint64_t t_lim_t, uint64_t threshold_t, uint64_t n_perms_t, uint64_t n_segs_t=0, uint64_t seg_size_t=0>
+    template<class uint_type_t, uint64_t w_size_t, uint64_t app_seq_len_t, uint64_t t_lim_t, uint64_t threshold_t, uint64_t n_perms_t, uint64_t n_segs_t=0, uint64_t seg_size_t=0>
     class min_hash_idx {
     public:
         min_hash_idx() = default;
@@ -53,7 +53,7 @@ namespace min_hash_index{
                 hash_ranges[i].first = start;
                 hash_ranges[i].second = end;
             }
-            for(uint64_t i=0; i<this->keys.size(); i++){
+            for(uint_type i=0; i<this->keys.size(); i++){
                 insert(i, this->keys[i]);
             }
             /*for(auto seg_map:segments_map) {
@@ -77,7 +77,8 @@ namespace min_hash_index{
         std::string app_seq =  std::string(app_seq_len_t, 'T');
         //std::string app_seq = "HELLHELLHELLH";
         std::vector<std::string> keys;
-        std::vector<std::unordered_map<uint64_t, std::vector<uint64_t>>> segments_map;
+        typedef uint_type_t uint_type;
+        std::vector<std::unordered_map<uint64_t, std::vector<uint_type>>> segments_map;
 
         void store_to_file(std::string idx_file){
             std::ofstream idx_file_ofs(idx_file);
@@ -115,7 +116,7 @@ namespace min_hash_index{
                 /*std::cout << seg_hash << "\n";*/
                 if(seg_map.count(seg_hash) != 0){
                     auto& res_v = seg_map[seg_hash];
-                    std::for_each(res_v.begin(), res_v.end(), [&](uint64_t &key_index){ res.push_back(key_index);});
+                    std::for_each(res_v.begin(), res_v.end(), [&](uint_type &key_index){ res.push_back(key_index);});
                 }
             }
 
@@ -125,19 +126,19 @@ namespace min_hash_index{
             res_s.reserve(res.size());
             //std::for_each(res.begin(), res.end(), [&](uint64_t key_index){if(mh.compareHashes(keys[key_index] + app_seq, key, threshold)) {res_s.push_back(keys[key_index]);}});
             //std::for_each(res.begin(), res.end(), [&](uint64_t key_index){res_s.push_back(keys[key_index]);});
-            std::for_each(res.begin(), res.end(), [&](uint64_t key_index){if(uiLevenshteinDistance(keys[key_index] + app_seq, key) <= t_lim_t) {res_s.push_back(keys[key_index]);}});
+            std::for_each(res.begin(), res.end(), [&](uint_type key_index){if(uiLevenshteinDistance(keys[key_index] + app_seq, key) <= t_lim_t) {res_s.push_back(keys[key_index]);}});
             std::cout << "Matches: " << res_s.size() << std::endl;
             return {res.size(), res_s};
         }
 
-        void insert(uint64_t key_index, std::string key){
+        void insert(uint_type key_index, std::string key){
             key += app_seq;
             auto segment_hashes = get_segments_hashes(mh.hashify(key));
             for(uint64_t i=0; i < n_segs; i++){
                 auto & seg_map = segments_map[i];
                 auto hash_key = segment_hashes[i];
                 if(seg_map.count(hash_key) == 0){
-                    seg_map[hash_key] = std::vector<uint64_t>();
+                    seg_map[hash_key] = std::vector<uint_type>();
                 }
                 seg_map[hash_key].push_back(key_index);
             }
