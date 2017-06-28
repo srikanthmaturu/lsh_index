@@ -16,7 +16,7 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
     list<string> hdrf_lines, mhrf_lines;
     uint64_t mbcount = 0 , mocount = 0, mecount = 0;
     list<string> hdrf_partial, mhrf_partial;
-    uint64_t batch_size = 100000;
+    uint64_t batch_size = 10;
     while (!hd_fs.eof() || !mh_fs.eof()){
         for(uint64_t i=0; i<batch_size; i++){
             string hd_fs_line, mh_fs_line;
@@ -30,14 +30,19 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
                 mhrf_lines.push_back(mh_fs_line);
             }
         }
+        hdrf_lines.insert(hdrf_lines.begin(), hdrf_partial.begin(), hdrf_partial.end());
+        mhrf_lines.insert(mhrf_lines.begin(), mhrf_partial.begin(), mhrf_partial.end());
+
         if(hd_fs.eof()){
             hdrf_lines.pop_back();
         }else{
             hdrf_partial.clear();
             bool partial_extracted = false;
             while(!partial_extracted){
-                string & last = hdrf_lines.back();
+                string& lastr = hdrf_lines.back();
+                string last = lastr;
                 hdrf_partial.push_front(last);
+                hdrf_lines.pop_back();
                 if(last[0] == '>'){
                     partial_extracted = true;
                 }
@@ -51,15 +56,15 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
             mhrf_partial.clear();
             bool partial_extracted = false;
             while(!partial_extracted){
-                string & last = mhrf_lines.back();
+                string & lastr = mhrf_lines.back();
+                string last = lastr;
                 mhrf_partial.push_front(last);
+                mhrf_lines.pop_back();
                 if(last[0] == '>'){
                     partial_extracted = true;
                 }
             }
         }
-        hdrf_lines.insert(hdrf_lines.begin(), hdrf_partial.begin(), hdrf_partial.end());
-        mhrf_lines.insert(mhrf_lines.begin(), mhrf_partial.begin(), mhrf_partial.end());
 
 
         while(hdrf_lines.size()>0 || mhrf_lines.size()>0){
