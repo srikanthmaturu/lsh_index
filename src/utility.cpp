@@ -6,35 +6,81 @@
 #include <regex>
 #include <vector>
 #include <fstream>
-#include <iterator>
-#include <sstream>
+#include <list>
+
 using namespace std;
 
-void getQueriesCount(string hamming_distance_results_file, string min_hash_results_file){
 
-    string pattern = "";
-    regex reg(pattern);
+void getQueriesCount(string hamming_distance_results_file, string min_hash_results_file){
     ifstream hd_fs(hamming_distance_results_file), mh_fs(min_hash_results_file);
-    regex_iterator<string::iterator> hf_it(istreambuf_iterator<char>(hd_fs), istreambuf_iterator<char>()),
-            mhf_it(istreambuf_iterator<char>(mh_fs), istreambuf_iterator<char>()), rend;
-    uint64_t mbcount, mocount;
-    while (hf_it !=rend && mhf_it != rend){
-        string hf_match = *hf_it , mh_match = *mhf_it;
-        vector<string> hf_match_lines = strtok(hf_match, '\n'), mh_match_lines = strtok(mh_match, '\n');
-        if(hf_match_lines[0] == mh_match_lines[0]){
-            if(hf_match_lines.size()> 1 && mh_match_lines.size() == 1){
-                mocount++;
+    list<string> hdrf_lines, mhrf_lines;
+    uint64_t mbcount = 0 , mocount = 0, mecount = 0;
+    uint64_t batch_size = 100000;
+    while (!hd_fs.eof() || !mh_fs.eof()){
+        for(uint64_t i=0; i<batch_size; i++){
+            string hd_fs_line, mh_fs_line;
+            if(!hd_fs.eof()){
+                getline(hd_fs, hd_fs_line);
+                hdrf_lines.push_back(hd_fs_line);
             }
-            if(hf_match_lines.size()> 1 && mh_match_lines.size() > 1){
-                uint64_t hd = stoi(strtok(hf_match_lines[1], "  ")[1]), ed = stoi(strtok(mh_match_lines[1], "  ")[1]);
-                if(hd <= ed){
-                    mbcount++;
+
+            if(!mh_fs.eof()){
+                getline(mh_fs, mh_fs_line);
+                mhrf_lines.push_back(mh_fs_line);
+            }
+        }
+        if(hd_fs.eof()){
+            hdrf_lines.pop_back();
+        }
+
+        if(mh_fs.eof()) {
+            mhrf_lines.pop_back();
+        }
+
+
+        while(hdrf_lines.size()>0 || mhrf_lines.size()>0){
+            if(hdrf_lines.front() == mhrf_lines.front()){
+                string query = *hdrf_lines.begin();
+                hdrf_lines.pop_front();
+                mhrf_lines.pop_front();
+                vector<string> hd_matches, mh_matches;
+                bool hdf = true, mhf = true;
+                while(hdf || mhf){
+                    if(hdrf_lines.size() > 0 && (*hdrf_lines.begin())[0] != '>'){
+                        hd_matches.push_back(*hdrf_lines.begin());
+                        hdrf_lines.pop_front();
+                    } else {
+                        hdf = false;
+                    }
+                    if(mhrf_lines.size() > 0 && (*mhrf_lines.begin())[0] != '>'){
+                        mh_matches.push_back(*mhrf_lines.begin());
+                        mhrf_lines.pop_front();
+                    } else {
+                        mhf = false;
+                    }
+                }
+
+                if(hd_matches.size()> 0 && mh_matches.size() == 0){
+                    mocount++;
+                }
+                if(hd_matches.size()> 0 && mh_matches.size() > 0){
+                    /*cout << hd_matches[0] << " " << hd_matches[0].size()<< endl;
+                    cout << mh_matches[0] << " " << hd_matches[0].size() << endl;*/
+                    size_t p1 = hd_matches[0].find("  ") + 2 , p2 = mh_matches[0].find("  ") + 2;
+                    //cout << " p1 " << p1 << " p2 " << p2 << endl;
+                    uint64_t hd = stoi(hd_matches[0].substr(p1)), ed = stoi(mh_matches[0].substr(p2));
+                    if(hd > ed){
+                        mbcount++;
+                    }
+                    else if(hd == ed){
+                        mecount++;
+                    }
                 }
             }
         }
     }
 
-    cout << " MBCount " << mbcount << " MOCount " << mocount << endl;
+    cout << " MBCount " << mbcount << " MOCount " << mocount << " MECOUNT "<< mecount << endl;
 
 }
 
