@@ -71,7 +71,7 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
         }
 
 	cout << "Bottom path removed and saved for use in next cycle" << endl;
-        while(hdrf_lines.size()>0 && mhrf_lines.size()>0){
+        while(hdrf_lines.size()>0 || mhrf_lines.size()>0){
             if(hdrf_lines.front() == mhrf_lines.front()){
                 string query = *hdrf_lines.begin();
                 hdrf_lines.pop_front();
@@ -109,11 +109,16 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
                         mecount++;
                     }
                 }
-		cout << "Hooray! processed a query" << endl;
             }else {
-		cout << " Bad sign got here. Help me! " << endl;
-		cout << " You must check this out. " << hdrf_lines.front() << " " << mhrf_lines.front() << endl;
-		exit(1);
+                if(hdrf_lines.size()>0){
+                    hdrf_partial.insert(hdrf_partial.begin(), hdrf_lines.begin(), hdrf_lines.end());
+                    hdrf_lines.clear();
+                }
+                if(mhrf_lines.size()>0){
+                    mhrf_lines.insert(mhrf_lines.begin(), mhrf_lines.begin(), mhrf_lines.end());
+                    mhrf_lines.clear();
+                }
+		        cout << " Bad sign getting out here. Leftovers are moved to partials. " << endl;
             }
         }
 	cout << " Batch cycle completed. " << endl;
