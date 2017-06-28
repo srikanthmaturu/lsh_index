@@ -16,7 +16,7 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
     list<string> hdrf_lines, mhrf_lines;
     uint64_t mbcount = 0 , mocount = 0, mecount = 0;
     list<string> hdrf_partial, mhrf_partial;
-    uint64_t batch_size = 1000000;
+    uint64_t batch_size = 100000;
     uint64_t count = 0;
     while (!hd_fs.eof() || !mh_fs.eof()){
         cout << "Processint a batch.." << count << endl;
@@ -33,6 +33,7 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
                 mhrf_lines.push_back(mh_fs_line);
             }
         }
+	cout << "Read lines" << endl;
         hdrf_lines.insert(hdrf_lines.begin(), hdrf_partial.begin(), hdrf_partial.end());
         mhrf_lines.insert(mhrf_lines.begin(), mhrf_partial.begin(), mhrf_partial.end());
 
@@ -69,8 +70,8 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
             }
         }
 
-
-        while(hdrf_lines.size()>0 || mhrf_lines.size()>0){
+	cout << "Bottom path removed and saved for use in next cycle" << endl;
+        while(hdrf_lines.size()>0 && mhrf_lines.size()>0){
             if(hdrf_lines.front() == mhrf_lines.front()){
                 string query = *hdrf_lines.begin();
                 hdrf_lines.pop_front();
@@ -108,10 +109,14 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
                         mecount++;
                     }
                 }
+		cout << "Hooray! processed a query" << endl;
             }else {
-
+		cout << " Bad sign got here. Help me! " << endl;
+		cout << " You must check this out. " << hdrf_lines.front() << " " << mhrf_lines.front() << endl;
+		exit(1);
             }
         }
+	cout << " Batch cycle completed. " << endl;
     }
 
     cout << " MBCount " << mbcount << " MOCount " << mocount << " MECOUNT "<< mecount << endl;
