@@ -16,8 +16,11 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
     list<string> hdrf_lines, mhrf_lines;
     uint64_t mbcount = 0 , mocount = 0, mecount = 0;
     list<string> hdrf_partial, mhrf_partial;
-    uint64_t batch_size = 10;
+    uint64_t batch_size = 1000000;
+    uint64_t count = 0;
     while (!hd_fs.eof() || !mh_fs.eof()){
+        cout << "Processint a batch.." << count << endl;
+        count++;
         for(uint64_t i=0; i<batch_size; i++){
             string hd_fs_line, mh_fs_line;
             if(!hd_fs.eof()){
