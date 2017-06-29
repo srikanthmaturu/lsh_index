@@ -15,7 +15,8 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
     ifstream hd_fs(hamming_distance_results_file), mh_fs(min_hash_results_file);
     list<string> hdrf_lines, mhrf_lines;
     uint64_t mbcount = 0 , mocount = 0, mecount = 0;
-    uint64_t batch_size = 1000000;
+    list<string> hdrf_partial, mhrf_partial;
+    uint64_t batch_size = 100000;
     uint64_t count = 0;
     while (!hd_fs.eof() || !mh_fs.eof()){
         cout << "Processing a batch.." << count << endl;
@@ -33,17 +34,44 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
             }
         }
 	cout << "Read lines" << endl;
+        hdrf_lines.insert(hdrf_lines.begin(), hdrf_partial.begin(), hdrf_partial.end());
+        mhrf_lines.insert(mhrf_lines.begin(), mhrf_partial.begin(), mhrf_partial.end());
+
         if(hd_fs.eof()){
             hdrf_lines.pop_back();
+        }else{
+            hdrf_partial.clear();
+            bool partial_extracted = false;
+            while(!partial_extracted){
+                string& lastr = hdrf_lines.back();
+                string last = lastr;
+                hdrf_partial.push_front(last);
+                hdrf_lines.pop_back();
+                if(last[0] == '>'){
+                    partial_extracted = true;
+                }
+            }
         }
 
         if(mh_fs.eof()) {
             mhrf_lines.pop_back();
         }
-
+        else {
+            mhrf_partial.clear();
+            bool partial_extracted = false;
+            while(!partial_extracted){
+                string & lastr = mhrf_lines.back();
+                string last = lastr;
+                mhrf_partial.push_front(last);
+                mhrf_lines.pop_back();
+                if(last[0] == '>'){
+                    partial_extracted = true;
+                }
+            }
+        }
 
 	cout << "Bottom path removed and saved for use in next cycle" << endl;
-        while(hdrf_lines.size()>0 && mhrf_lines.size()>0){
+        while(hdrf_lines.size()>0 || mhrf_lines.size()>0){
             if(hdrf_lines.front() == mhrf_lines.front()){
                 string query = *hdrf_lines.begin();
                 hdrf_lines.pop_front();
@@ -82,8 +110,19 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
                     }
                 }
             }else {
-                cout << "Status: MBCount " << mbcount << " MOCount " << mocount << " MECOUNT "<< mecount << "  HDS:"<< hdrf_lines.size() << "  MHS:" << mhrf_lines.size() << endl;
-                break;
+                if(hdrf_lines.size()>0){
+                    hdrf_partial.insert(hdrf_partial.begin(), hdrf_lines.begin(), hdrf_lines.end());
+                    cout << "HD top line: " << hdrf_partial.front() << endl;
+                    hdrf_lines.clear();
+                }
+                if(mhrf_lines.size()>0){
+                    mhrf_partial.insert(mhrf_partial.begin(), mhrf_lines.begin(), mhrf_lines.end());
+                    cout << "MH top line: " << mhrf_partial.front() << endl;
+                    mhrf_lines.clear();
+                }
+
+		        cout << " Bad sign getting out here. Leftovers are moved to partials. hP: " << hdrf_partial.size() << " mP: " << mhrf_partial.size() << endl;
+                cout << "Status: MBCount " << mbcount << " MOCount " << mocount << " MECOUNT "<< mecount << endl;
             }
         }
 	cout << " Batch cycle completed. " << endl;
