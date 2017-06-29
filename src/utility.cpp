@@ -16,7 +16,7 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
     list<string> hdrf_lines, mhrf_lines;
     uint64_t mbcount = 0 , mocount = 0, mecount = 0;
     list<string> hdrf_partial, mhrf_partial;
-    uint64_t batch_size = 100000;
+    uint64_t batch_size = 1000000;
     uint64_t count = 0;
     while (!hd_fs.eof() || !mh_fs.eof()){
         cout << "Processing a batch.." << count << endl;
@@ -29,6 +29,8 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
             }
 
             if(!mh_fs.eof()){
+		if(mhrf_partial.size()>250000){
+			continue;}
                 getline(mh_fs, mh_fs_line);
                 mhrf_lines.push_back(mh_fs_line);
             }
@@ -36,11 +38,11 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
 	cout << "Read lines" << endl;
         hdrf_lines.insert(hdrf_lines.begin(), hdrf_partial.begin(), hdrf_partial.end());
         mhrf_lines.insert(mhrf_lines.begin(), mhrf_partial.begin(), mhrf_partial.end());
-
+	hdrf_partial.clear();
+	mhrf_partial.clear();
         if(hd_fs.eof()){
             hdrf_lines.pop_back();
         }else{
-            hdrf_partial.clear();
             bool partial_extracted = false;
             while(!partial_extracted){
                 string& lastr = hdrf_lines.back();
@@ -57,7 +59,6 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
             mhrf_lines.pop_back();
         }
         else {
-            mhrf_partial.clear();
             bool partial_extracted = false;
             while(!partial_extracted){
                 string & lastr = mhrf_lines.back();
