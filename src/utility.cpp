@@ -19,7 +19,7 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
     uint64_t batch_size = 100000;
     uint64_t count = 0;
     while (!hd_fs.eof() || !mh_fs.eof()){
-        cout << "Processint a batch.." << count << endl;
+        cout << "Processing a batch.." << count << endl;
         count++;
         for(uint64_t i=0; i<batch_size; i++){
             string hd_fs_line, mh_fs_line;
@@ -118,7 +118,7 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
                     mhrf_lines.insert(mhrf_lines.begin(), mhrf_lines.begin(), mhrf_lines.end());
                     mhrf_lines.clear();
                 }
-		        cout << " Bad sign getting out here. Leftovers are moved to partials. " << endl;
+		        cout << " Bad sign getting out here. Leftovers are moved to partials. hP: " << hdrf_partial.size() << " mP: " << mhrf_partial.size() << endl;
             }
         }
 	cout << " Batch cycle completed. " << endl;
