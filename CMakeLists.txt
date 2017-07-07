@@ -36,6 +36,7 @@ ADD_SUBDIRECTORY(lib)
 
 add_library(xxhash include/min_hash_index/xxhash.c)
 ADD_EXECUTABLE(utility src/utility.cpp)
+TARGET_LINK_LIBRARIES(utility xxhash)
 
 FILE(STRINGS ${CMAKE_HOME_DIRECTORY}/exp0.config exp0.lines REGEX "^[^#].*")
 FOREACH(line ${exp0.lines})

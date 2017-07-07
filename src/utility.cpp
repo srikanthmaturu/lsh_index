@@ -7,7 +7,7 @@
 #include <vector>
 #include <fstream>
 #include <list>
-
+#include "min_hash_index/xxhash.h"
 using namespace std;
 
 
@@ -94,7 +94,30 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
                     }
                 }
 
-                if(hd_matches.size()> 0 && mh_matches.size() == 0){
+                vector<uint64_t> hd_matches_hashes, mh_matches_hashes;
+                for_each(hd_matches.begin(), hd_matches.end(), [&](string hd_match){ hd_matches_hashes.push_back(XXH64(hd_match.c_str(), 5, 0xcc9e2d51));} );
+                for_each(mh_matches.begin(), mh_matches.end(), [&](string mh_match){ mh_matches_hashes.push_back(XXH64(mh_match.c_str(), 5, 0xcc9e2d51));} );
+                sort(hd_matches_hashes.begin(), hd_matches_hashes.end());
+                sort(mh_matches_hashes.begin(), mh_matches_hashes.end());
+                uint64_t hi = 0, his = hd_matches_hashes.size(), mi = 0, mis = mh_matches_hashes.size();
+                uint64_t mh_oc = 0, hd_oc = 0, m_h_ec = 0;
+                while(hi < his || mi < mis){
+                    if(hd_matches_hashes[hi] == mh_matches_hashes[mi]){
+                        m_h_ec++;
+                        hi++;
+                        mi++;
+                    }
+                    else if(hd_matches_hashes[hi] < mh_matches_hashes[mi]){
+                        hd_oc++;
+                        hi++;
+                    }
+                    else {
+                        mh_oc++;
+                        mi++;
+                    }
+                }
+                cout << "MH_UC: " << mh_oc << "\tHD_UC: "<< hd_oc << "\tMH_HD_EC: "<< m_h_ec << endl;
+                if(hd_matches.size() == 0 && mh_matches.size() > 0){
                     mocount++;
                 }
                 if(hd_matches.size()> 0 && mh_matches.size() > 0){
@@ -132,6 +155,8 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
     cout << " MBCount " << mbcount << " MOCount " << mocount << " MECOUNT "<< mecount << endl;
 
 }
+
+
 
 
 int main(int argc, char* argv[]){
