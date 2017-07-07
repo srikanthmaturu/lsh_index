@@ -74,7 +74,8 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
 	cout << "Bottom path removed and saved for use in next cycle" << endl;
         while(hdrf_lines.size()>0 || mhrf_lines.size()>0){
             if(hdrf_lines.front() == mhrf_lines.front()){
-                string query = *hdrf_lines.begin();
+                cout << ">" << hdrf_lines.front() ;
+		string query = *hdrf_lines.begin();
                 hdrf_lines.pop_front();
                 mhrf_lines.pop_front();
                 vector<string> hd_matches, mh_matches;
@@ -101,7 +102,7 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
                 sort(mh_matches_hashes.begin(), mh_matches_hashes.end());
                 uint64_t hi = 0, his = hd_matches_hashes.size(), mi = 0, mis = mh_matches_hashes.size();
                 uint64_t mh_oc = 0, hd_oc = 0, m_h_ec = 0;
-                while(hi < his || mi < mis){
+                while(hi < his && mi < mis){
                     if(hd_matches_hashes[hi] == mh_matches_hashes[mi]){
                         m_h_ec++;
                         hi++;
@@ -116,7 +117,9 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
                         mi++;
                     }
                 }
-                cout << "MH_UC: " << mh_oc << "\tHD_UC: "<< hd_oc << "\tMH_HD_EC: "<< m_h_ec << endl;
+		hd_oc += his - hi;
+		mh_oc += mis - mi;
+                cout << " "  << "MH_UC: " << mh_oc << "\tHD_UC: "<< hd_oc << "\tMH_HD_EC: "<< m_h_ec << endl;
                 if(hd_matches.size() == 0 && mh_matches.size() > 0){
                     mocount++;
                 }
