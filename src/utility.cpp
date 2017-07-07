@@ -19,7 +19,7 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
     uint64_t batch_size = 1000000;
     uint64_t count = 0;
     while (!hd_fs.eof() || !mh_fs.eof()){
-        cout << "Processing a batch.." << count << endl;
+        //cout << "Processing a batch.." << count << endl;
         count++;
         for(uint64_t i=0; i<batch_size; i++){
             string hd_fs_line, mh_fs_line;
@@ -35,7 +35,7 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
                 mhrf_lines.push_back(mh_fs_line);
             }
         }
-	cout << "Read lines" << endl;
+	//cout << "Read lines" << endl;
         hdrf_lines.insert(hdrf_lines.begin(), hdrf_partial.begin(), hdrf_partial.end());
         mhrf_lines.insert(mhrf_lines.begin(), mhrf_partial.begin(), mhrf_partial.end());
 	hdrf_partial.clear();
@@ -71,10 +71,10 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
             }
         }
 
-	cout << "Bottom path removed and saved for use in next cycle" << endl;
+	//cout << "Bottom path removed and saved for use in next cycle" << endl;
         while(hdrf_lines.size()>0 || mhrf_lines.size()>0){
             if(hdrf_lines.front() == mhrf_lines.front()){
-                cout << ">" << hdrf_lines.front() ;
+                cout <<  hdrf_lines.front() ;
 		string query = *hdrf_lines.begin();
                 hdrf_lines.pop_front();
                 mhrf_lines.pop_front();
@@ -139,20 +139,20 @@ void getQueriesCount(string hamming_distance_results_file, string min_hash_resul
             }else {
                 if(hdrf_lines.size()>0){
                     hdrf_partial.insert(hdrf_partial.begin(), hdrf_lines.begin(), hdrf_lines.end());
-                    cout << "HD top line: " << hdrf_partial.front() << endl;
+                    //cout << "HD top line: " << hdrf_partial.front() << endl;
                     hdrf_lines.clear();
                 }
                 if(mhrf_lines.size()>0){
                     mhrf_partial.insert(mhrf_partial.begin(), mhrf_lines.begin(), mhrf_lines.end());
-                    cout << "MH top line: " << mhrf_partial.front() << endl;
+                    //cout << "MH top line: " << mhrf_partial.front() << endl;
                     mhrf_lines.clear();
                 }
 
-		        cout << " Bad sign getting out here. Leftovers are moved to partials. hP: " << hdrf_partial.size() << " mP: " << mhrf_partial.size() << endl;
-                cout << "Status: MBCount " << mbcount << " MOCount " << mocount << " MECOUNT "<< mecount << endl;
+		    //cout << " Bad sign getting out here. Leftovers are moved to partials. hP: " << hdrf_partial.size() << " mP: " << mhrf_partial.size() << endl;
+                //cout << "Status: MBCount " << mbcount << " MOCount " << mocount << " MECOUNT "<< mecount << endl;
             }
         }
-	cout << " Batch cycle completed. " << endl;
+	//cout << " Batch cycle completed. " << endl;
     }
 
     cout << " MBCount " << mbcount << " MOCount " << mocount << " MECOUNT "<< mecount << endl;
