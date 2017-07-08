@@ -51,16 +51,16 @@ auto optimal_param(double_t threshold, uint64_t n_perms, double_t false_positive
     return param;
 }
 
-auto optimal_threshold1(uint64_t fixed_key_size, uint64_t w_size, double threshold, double t_limit){
+auto optimal_threshold_1(uint64_t fixed_key_size, uint64_t w_size, double threshold, double t_limit){
     std::cout << " KS: " << fixed_key_size << " WS: " << w_size << " Th: " << threshold << " Tl: " << t_limit << std::endl;
     uint64_t tokens_size = fixed_key_size - w_size + 1;
     double number_of_distinct_items_estimate = t_limit*w_size;
-    double threshold_estimate = (float)(tokens_size - number_of_distinct_items_estimate)/(float)(tokens_size + number_of_distinct_items_estimate);
+    double threshold_estimate = (float)(tokens_size - number_of_distinct_items_estimate)/(float)(tokens_size);
     double reductionFactor = 0.95;
     return reductionFactor*threshold_estimate;
 }
 
-auto optimal_threshold(uint64_t fixed_key_size, uint64_t w_size, double threshold, double t_limit){
+auto optimal_threshold_2(uint64_t fixed_key_size, uint64_t w_size, double threshold, double t_limit){
     std::cout << " KS: " << fixed_key_size << " WS: " << w_size << " Th: " << threshold << " Tl: " << t_limit << std::endl;
     uint64_t tokens_size = fixed_key_size - w_size + 1;
     double number_of_distinct_items_estimate = w_size + t_limit - 1;

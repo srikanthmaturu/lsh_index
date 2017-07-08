@@ -31,9 +31,20 @@ namespace min_hash_index{
 
         min_hash_idx(std::vector<std::string>& keys){
             this->keys = keys;
-            threshold = optimal_threshold(keys[0].length() + app_seq_len_t, w_size_t, (double_t)threshold_t/(double_t)100, t_lim_t);
-            std::cout << "Optimal threshold calculated Th: " << threshold << std::endl;
-            std::cout << "Input threshold omitted." << std::endl;
+            double_t input_threshold =  (double_t)threshold_t/(double_t)100;
+            if(input_threshold < 1){
+                threshold = input_threshold;
+            }
+            else if(input_threshold == 1){
+                threshold = optimal_threshold_1(keys[0].length() + app_seq_len_t, w_size_t, input_threshold, t_lim_t);
+                std::cout << "Type 1 threshold (optimal) computed." << std::endl;
+            }
+            else{
+                threshold = optimal_threshold_2(keys[0].length() + app_seq_len_t, w_size_t, input_threshold, t_lim_t);
+                std::cout << "Type 2 threshold (relaxed) computed." << std::endl;
+            }
+            std::cout << "Threshold set to Th: " << threshold << std::endl;
+
             if(n_segs == 0){
                 auto param = optimal_param(threshold, n_perms_t, 20, 15);
                 n_segs = param.first;

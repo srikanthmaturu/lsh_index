@@ -142,7 +142,7 @@ int main(int argc, char* argv[]){
 
         for(uint64_t i=0; i < queries.size(); i++){
             results_file << ">" << queries[i] << endl;
-            cout << "Stored results of " << i << endl;
+            //cout << "Stored results of " << i << endl;
             for(size_t j=0; j<query_results_vector[i].size(); j++){
                 results_file << "" << query_results_vector[i][j].first.c_str() << "  " << query_results_vector[i][j].second << endl;
             }
